@@ -8,7 +8,7 @@ function orderLocalStorage() {
     let recordsArray = [];
     
     for(let i = 0; i < localStorage.length; i++)
-        recordsArray[i] = localStorage.getItem(`record ${i}`);
+        recordsArray[i] = Number(localStorage.getItem(`record ${i}`));
     
     recordsArray.sort((num1,num2) => {
         if(num1 > num2) return 1;
@@ -29,19 +29,28 @@ function saveRecordInLocalStorage(number) {
     {   
         orderLocalStorage(); 
 
-        if(number > localStorage.getItem('record 5'))
+        if(number > Number(localStorage.getItem('record 0')))
         {
-            localStorage.setItem(localStorage.key(4), number);
+            localStorage.setItem(`record 0`, number);
         }
+
+        orderLocalStorage(); 
     }
 }
 
-/*saveRecordInLocalStorage(4);
-saveRecordInLocalStorage(2);
-saveRecordInLocalStorage(9);
-saveRecordInLocalStorage(2);
-saveRecordInLocalStorage(55);
-saveRecordInLocalStorage(23);
-saveRecordInLocalStorage(1232);
-saveRecordInLocalStorage(3);
-saveRecordInLocalStorage(43);*/
+function makeRecordsBoard() {
+
+    let xMargin = 50;
+    context.fillStyle = "gold";
+    context.font = "12px David";
+    context.fillText("RECORD BOARD", canvas.width / 3, canvas.height - 75);
+
+    context.font = "9px David";
+
+    for(let i = 0; i < 5; i ++)
+    {
+        let record = localStorage.getItem(`record ${i}`);
+        context.fillText(`${i+1}:   ${record}`, canvas.width / 8 + xMargin * i, canvas.height - 60);
+    }
+}
+

@@ -16,12 +16,13 @@ let gameEnded = false;
 let globalID; 
 let isFramePaused = false;
 
-// let jumpVoice = new Audio("https://archive.org/download/jump_20210424/jump.wav");
 let isOnIntroductionPage = true;
 let presentTime = 1100;
-let obsticleSpeed = 3;
-let coinSpeed = 3;
+let obsticleSpeed = 2;
+let coinSpeed = 2;
 let score = 0;
+let scoreToReachToIncreaseSpeed = 999;
+let speedAdded = false;
 
 arrayOfObsticles = [];
 arrayOfCoins = [];
@@ -32,7 +33,7 @@ class Player{
         this.x = x;
         this.y = y;
         this.size = size;
-        this.color = color; // maybe put an option to set square color
+        this.color = color; 
         this.jumpHeight = 3; 
         this.shouldBeJumping = false;
         this.jumpCounter = 0;
@@ -276,9 +277,11 @@ function animateGame() {
             cancelAnimationFrame(globalID);
             writeLostGameInstructions();
             gameEnded = true;
+            saveRecordInLocalStorage(score);
+            makeRecordsBoard();
         }
         
-        // delete obsticles that are'nt in the 
+        // delete obsticles that are'nt in the frame
         if((obsticle.x + obsticle.size) <= 0)
         {
             setTimeout(() => {
@@ -299,20 +302,23 @@ function animateGame() {
             }, 0)
 
             score += 100;
-            // make noise of coin collecting
         }
-        /*
-        // delete obsticles that are'nt in the 
-        if((obsticle.x + obsticle.size) <= 0)
-        {
-            setTimeout(() => {
-                arrayOfObsticles.splice(index, 1);
-            }, 0)
-
-            score += 10;
-        }
-        */
     });
+
+
+    if(score < 10000)
+    {
+        if(score > scoreToReachToIncreaseSpeed && speedAdded == false)
+        {
+            coinSpeed += 0.5;
+            obsticleSpeed += 0.5;
+            speedAdded = true;
+            scoreToReachToIncreaseSpeed += 1000;
+        }
+
+        if(speedAdded == true && score > scoreToReachToIncreaseSpeed)
+            speedAdded = false;
+    }
 }
 
 function chooseColor()
@@ -368,7 +374,8 @@ function restartGame() {
     arrayOfObsticles.splice(0,arrayOfObsticles.length);
     arrayOfCoins.splice(0,arrayOfCoins.length);
     presentTime = 1100;
-    obsticleSpeed = 3;
+    obsticleSpeed = 2;
+    coinSpeed = 2;
     score = 0;
     gameEnded = false;
     colorChosen = chooseColor();
@@ -415,6 +422,5 @@ window.addEventListener('keyup', event => {
     if (event.code === 'KeyR' && gameEnded == true)
     {
         restartGame();
-        localStorage.setItem(`record 5`, score);
     }
 })
