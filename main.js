@@ -1,5 +1,7 @@
 const coneImage = new Image();
 coneImage.src = 'images/cone.png';
+const coinImage = new Image();
+coinImage.src = 'images/coin.png';
 
 const canvas = document.getElementById("game");
 const context = canvas.getContext("2d");
@@ -8,17 +10,21 @@ const arrayOfPlayerColors = ['blue', 'green', 'red', 'pink',
                             'yellow', 'purple', 'brown', 'magenta',
                             'lime', 'blanchedalmond'];
 
-const colorChosen = chooseColor();
+let colorChosen = chooseColor();
 
+let gameEnded = false;
 let globalID; 
 let isFramePaused = false;
 
 // let jumpVoice = new Audio("https://archive.org/download/jump_20210424/jump.wav");
 let isOnIntroductionPage = true;
-let presentTime = 1200;
-let obsticleSpeed = 2;
+let presentTime = 1100;
+let obsticleSpeed = 3;
+let coinSpeed = 3;
+let score = 0;
 
 arrayOfObsticles = [];
+arrayOfCoins = [];
 
 class Player{
 
@@ -113,14 +119,30 @@ class Obsticle {
         this.x = canvas.width + size;
         this.y = canvas.height - 38;
         this.size = size;
-        this. color = "black";
         this.speed = speed;
     }
 
     draw() {
+        context.drawImage(coneImage, this.x, this.y, this.size, this.size);
+    }
+    
+    slide() {
+        this.draw();
+        this.x -= this.speed;
+    }
+}
 
-        context.fillStyle = this.color;
-        context.fillRect(this.x, this.y, this.size, this.size); 
+class Coin {
+    constructor(size, speed)
+    {
+        this.x = canvas.width + size;
+        this.y = canvas.height - 78;
+        this.size = size;
+        this.speed = speed;
+    }
+
+    draw() {
+        context.drawImage(coinImage, this.x, this.y, this.size, this.size);
     }
     
     slide() {
@@ -136,14 +158,14 @@ function generateObsticles() {
     setTimeout(generateObsticles, timeBreak);
 }
 
-function collision(square, obsticle) {
+function obsticleCollision(square, obsticle) {
     let dummySquare = Object.assign(Object.create(Object.getPrototypeOf(square)), square);
     let dummyObsticle = Object.assign(Object.create(Object.getPrototypeOf(obsticle)), obsticle);
 
-    // for good visual collision rather than actual point to point
-    dummyObsticle.size -= 10; 
-    dummyObsticle.x += 10;
-    dummyObsticle.y += 10;
+    // for good visual collision  
+    dummyObsticle.size -= 1; 
+    dummyObsticle.x += 2.1;
+    dummyObsticle.y += 1.1;
  
     // s is right to o, "" "" "" left "" "", "" "" under o, "" "" above o
     return !(
@@ -153,6 +175,32 @@ function collision(square, obsticle) {
             dummySquare.y + dummySquare.size < dummyObsticle.y
         )
 }
+
+function generateCoins() {
+    let timeBreak = randomBreakBetweenCoins(presentTime);
+    arrayOfCoins.push(new Coin(7, coinSpeed));
+
+    setTimeout(generateCoins, timeBreak);
+}
+
+function coinCollision(square, coin) {
+    let dummySquare = Object.assign(Object.create(Object.getPrototypeOf(square)), square);
+    let dummyCoin = Object.assign(Object.create(Object.getPrototypeOf(coin)), coin);
+
+    // for good visual collision  
+    dummyCoin.size -= 1; 
+    dummyCoin.x += 2.1;
+    dummyCoin.y += 1.1;
+ 
+    // s is right to o, "" "" "" left "" "", "" "" under o, "" "" above o
+    return !(
+            dummySquare.x > dummyCoin.x + dummyCoin.size ||
+            dummySquare.x + dummySquare.size < dummyCoin.x ||
+            dummySquare.y > dummyCoin.y + dummyCoin.size ||
+            dummySquare.y + dummySquare.size < dummyCoin.y
+        )
+}
+
 
 // Responsible for make the background.
 function drawBackground() {
@@ -192,6 +240,22 @@ function writeMainGameInstructions() {
 
 }
 
+function writeLostGameInstructions() {
+
+
+    context.fillStyle = "black";
+    context.font = "15px David";
+    context.fillText("TYPE    `R`    TO  RESTART  THE  GAME",
+                     canvas.width / 15, canvas.height / 3);
+
+}
+
+function writeScore() {
+    context.font = "8px David";
+    context.fillStyle = "red";
+    context.fillText(score, canvas.width / 2, canvas.height / 6);
+}
+
 // Responsible for the game movement.
 function animateGame() {
 
@@ -200,24 +264,54 @@ function animateGame() {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     drawBackground();
-    writeMainGameInstructions()
+    writeMainGameInstructions();
     player.draw();
+    writeScore();
 
     arrayOfObsticles.forEach((obsticle, index) => {
         obsticle.slide();
 
-        if(collision(player, obsticle))
+        if(obsticleCollision(player, obsticle))
         {
-            console.log("fsdfsdf");
             cancelAnimationFrame(globalID);
+            writeLostGameInstructions();
+            gameEnded = true;
         }
+        
         // delete obsticles that are'nt in the 
         if((obsticle.x + obsticle.size) <= 0)
         {
             setTimeout(() => {
                 arrayOfObsticles.splice(index, 1);
             }, 0)
+
+            score += 10;
         }
+    });
+
+    arrayOfCoins.forEach((coin, index) => {
+        coin.slide();
+
+        if(coinCollision(player, coin))
+        {
+            setTimeout(() => {
+                arrayOfCoins.splice(index, 1);
+            }, 0)
+
+            score += 100;
+            // make noise of coin collecting
+        }
+        /*
+        // delete obsticles that are'nt in the 
+        if((obsticle.x + obsticle.size) <= 0)
+        {
+            setTimeout(() => {
+                arrayOfObsticles.splice(index, 1);
+            }, 0)
+
+            score += 10;
+        }
+        */
     });
 }
 
@@ -248,13 +342,39 @@ function randomBreakBetweenObsticles(breakTime) {
     return time;
 }
 
+function randomBreakBetweenCoins(breakTime) {
+    let time = breakTime;
+    if(Math.random() < 0.5)
+    {
+        time += generateNumber(presentTime / 3, presentTime * 4.5);
+    }
+    else 
+    {
+        time += generateNumber(presentTime / 10, presentTime / 2);
+    }
+    
+    return time;
+}
+
 // Creating the player object.
-const player = new Player(20, canvas.height - 41, 10, colorChosen);
+let player = new Player(20, canvas.height - 41, 10, colorChosen);
 
 // Makes the starting page of the game.
 drawBackground();
 writeStartGameInstructions();
 
+function restartGame() {
+
+    arrayOfObsticles.splice(0,arrayOfObsticles.length);
+    arrayOfCoins.splice(0,arrayOfCoins.length);
+    presentTime = 1100;
+    obsticleSpeed = 3;
+    score = 0;
+    gameEnded = false;
+    colorChosen = chooseColor();
+    player = new Player(20, canvas.height - 41, 10, colorChosen);
+    requestAnimationFrame(animateGame);
+}
 
 window.addEventListener('keyup', event => {
 
@@ -266,6 +386,9 @@ window.addEventListener('keyup', event => {
         setTimeout(() => {
             generateObsticles();
         }, randomBreakBetweenObsticles(presentTime));
+        setTimeout(() => {
+            generateCoins();
+        }, randomBreakBetweenCoins(presentTime));
     }
 
     if (event.code === 'Space' && isOnIntroductionPage == false)  
@@ -287,5 +410,11 @@ window.addEventListener('keyup', event => {
     {
         isFramePaused = false;
         globalID = requestAnimationFrame(animateGame);
+    }
+
+    if (event.code === 'KeyR' && gameEnded == true)
+    {
+        restartGame();
+        localStorage.setItem(`record 5`, score);
     }
 })
