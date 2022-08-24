@@ -35,7 +35,7 @@ function saveRecordInLocalStorage(number) {
     }
 }
 
-function makeRecordsBoard() {
+function makeRecordsBoard(context, canvas) {
 
     let index = 6;
     let xMargin = 50;
@@ -49,7 +49,11 @@ function makeRecordsBoard() {
     {
         index--;
         let record = localStorage.getItem(`record ${i}`);
+        if(record == null)
+            record = 0;
         context.fillText(`${index}:   ${record}`, canvas.width / 8 + xMargin * i, canvas.height - 60);
     }
 }
+
+export {orderLocalStorage, saveRecordInLocalStorage, makeRecordsBoard};
 

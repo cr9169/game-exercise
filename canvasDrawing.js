@@ -1,8 +1,6 @@
-/*const canvas = document.getElementById("game");
-const context = canvas.getContext("2d");
-
+import { config } from "./config.js";
 // Responsible for making the background.
-function drawBackground() {
+function drawBackground(context, canvas) {
 
     const gradient = context.createLinearGradient(0, 0, 0, 150);
 
@@ -19,7 +17,7 @@ function drawBackground() {
 }
 
 // Responsible for the pressing spagce to "swich pages" instruction. 
-function writeStartGameInstructions() {
+function writeStartGameInstructions(context, canvas) {
 
 
     context.fillStyle = "red";
@@ -29,7 +27,7 @@ function writeStartGameInstructions() {
 
 }
 
-function writeMainGameInstructions() {
+function writeMainGameInstructions(context, canvas) {
 
 
     context.fillStyle = "red";
@@ -39,7 +37,7 @@ function writeMainGameInstructions() {
 
 }
 
-function writeLostGameInstructions() {
+function writeLostGameInstructions(context, canvas) {
 
 
     context.fillStyle = "black";
@@ -49,10 +47,10 @@ function writeLostGameInstructions() {
 
 }
 
-function writeScore() {
+function writeScore(context, canvas, score) {
     context.font = "8px David";
     context.fillStyle = "red";
     context.fillText(score, canvas.width / 2, canvas.height / 6);
 }
 
-*/
+export {drawBackground, writeStartGameInstructions, writeMainGameInstructions, writeLostGameInstructions, writeScore};

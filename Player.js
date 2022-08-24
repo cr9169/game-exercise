@@ -1,4 +1,5 @@
-/* export class Player{
+import { config } from "./config.js";
+export class Player{
 
     constructor(x, y, size, color){
         this.x = x;
@@ -12,11 +13,11 @@
         this.spin = 0
         // spin of 90 degrees in 32 frames
         // stroes the current rotation of the player
-        this.spinIncrement = 90 / 32;
+        this.spinIncrement = config.SPIN_DEGREES / config.FRAMES;
     }
 
     // rotate the square 
-    rotation() {
+    rotation(context) {
         // square's center point x and y
         let xPossition = this.x + this.size / 2;
         let yPossition = this.y + this.size / 2;
@@ -32,7 +33,7 @@
     }
 
     // unrotate the square 
-    rotateBack() {
+    rotateBack(context) {
         let xPossition = this.x + this.size / 2;
         let yPossition = this.y + this.size / 2;
         context.translate(xPossition, yPossition);
@@ -41,7 +42,7 @@
         context.translate(-xPossition, -yPossition);
     }
 
-    jump() {
+    jump(context) {
 
         if(this.shouldBeJumping) {
             this.jumpCounter++;
@@ -59,29 +60,29 @@
                 this.y += this.jumpHeight;
             }
 
-            this.rotation();
+            this.rotation(context);
 
             if(this.jumpCounter >= 32) {
 
                 // makes that when we would like to rotate the square 
                 // another time, it woukd start the rorate calculations
                 // from an unrotated posision as we started with.
-                this.rotateBack();
+                this.rotateBack(context);
                 this.spin = 0;
                 this.shouldBeJumping = false;
             }
         }
     }
 
-    draw() {
+    draw(context) {
 
-        this.jump();
+        this.jump(context);
         context.fillStyle = this.color;
         context.fillRect(this.x, this.y, this.size, this.size); 
 
         if(this.shouldBeJumping)
-            this.rotateBack();
+            this.rotateBack(context);
     }
 
 }
-*/
+
