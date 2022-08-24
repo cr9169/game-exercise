@@ -1,8 +1,5 @@
 /*  here will be the handling of the records board. */
 
-// many js pages can be related to one html page and "work together"
-// on different things. one js page would'nt override others.
-
 function orderLocalStorage() {
 
     let recordsArray = [];
@@ -40,6 +37,7 @@ function saveRecordInLocalStorage(number) {
 
 function makeRecordsBoard() {
 
+    let index = 6;
     let xMargin = 50;
     context.fillStyle = "gold";
     context.font = "12px David";
@@ -49,8 +47,9 @@ function makeRecordsBoard() {
 
     for(let i = 0; i < 5; i ++)
     {
+        index--;
         let record = localStorage.getItem(`record ${i}`);
-        context.fillText(`${i+1}:   ${record}`, canvas.width / 8 + xMargin * i, canvas.height - 60);
+        context.fillText(`${index}:   ${record}`, canvas.width / 8 + xMargin * i, canvas.height - 60);
     }
 }
 

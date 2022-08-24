@@ -7,7 +7,7 @@ const canvas = document.getElementById("game");
 const context = canvas.getContext("2d");
 
 const arrayOfPlayerColors = ['blue', 'green', 'red', 'pink',
-                            'yellow', 'purple', 'brown', 'magenta',
+                            'yellow', 'purple', 'brown', 'mageSnta',
                             'lime', 'blanchedalmond'];
 
 let colorChosen = chooseColor();
@@ -40,7 +40,7 @@ class Player{
         // 0 = no spin
         this.spin = 0
         // spin of 90 degrees in 32 frames
-        // stroes the current rotation of the player
+        // stores the current rotation of the player
         this.spinIncrement = 90 / 32;
     }
 
